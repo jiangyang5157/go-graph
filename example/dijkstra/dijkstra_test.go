@@ -14,7 +14,7 @@ import (
 var js map[string]map[string]map[string]interface{}
 
 func setup() error {
-	file, err := os.Open("../../test/graph.json")
+	file, err := os.Open("../../testdata/graph.json")
 	if err != nil {
 		return err
 	}

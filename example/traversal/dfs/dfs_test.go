@@ -1,4 +1,4 @@
-package graph
+package dfs
 
 import (
 	"encoding/json"
@@ -7,12 +7,14 @@ import (
 	"log"
 	"os"
 	"testing"
+
+	"github.com/jiangyang5157/go-graph/graph"
 )
 
 var js map[string]map[string]map[string]interface{}
 
 func setup() error {
-	file, err := os.Open("../testdata/graph.json")
+	file, err := os.Open("../../../testdata/graph.json")
 	if err != nil {
 		return err
 	}
@@ -45,52 +47,40 @@ func TestMain(m *testing.M) {
 	os.Exit(exitCode)
 }
 
-func loadGraph(id string) (Graph, error) {
+func loadGraph(id string) (graph.Graph, error) {
 	if _, ok := js[id]; !ok {
 		return nil, fmt.Errorf("%s does not exist", id)
 	}
 	jsGraph := js[id]
 
-	g := NewGraph()
+	g := graph.NewGraph()
 	for id, neighbour := range jsGraph {
-		nd, err := g.GetNode(Id(id))
+		nd, err := g.GetNode(graph.Id(id))
 		if err != nil {
-			nd = NewNode(id)
+			nd = graph.NewNode(id)
 			g.AddNode(nd)
 		}
 		for id2, weight := range neighbour {
-			nd2, err := g.GetNode(Id(id2))
+			nd2, err := g.GetNode(graph.Id(id2))
 			if err != nil {
-				nd2 = NewNode(id2)
+				nd2 = graph.NewNode(id2)
 				g.AddNode(nd2)
 			}
-			edge := NewEdge(weight.(float64))
+			edge := graph.NewEdge(weight.(float64))
 			g.AddEdge(nd.Id(), nd2.Id(), edge)
 		}
 	}
 	return g, nil
 }
 
-func Test_Graph(t *testing.T) {
-	g, err := loadGraph("graph_00")
+func Test_Dfs(t *testing.T) {
+	g, err := loadGraph("graph_13")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	// test modify weight of edge
-	eg, err := g.GetEdge("S", "A")
-	eg.SetWeight(222.22)
-
-	eg2, err := g.GetEdge("S", "A")
-	if eg2.GetWeight() != 222.22 {
-		t.Fatal("Modify edge S --> A failed")
-	}
-	// test re-add edge
-	err = g.AddEdge("S", "A", NewEdge(1.11))
-	if err != ErrEdgeExisted {
-		t.Fatal("Should catch ErrEdgeExisted error")
-	}
-
 	// print graph
 	fmt.Println(g)
+
+	// todo
 }
