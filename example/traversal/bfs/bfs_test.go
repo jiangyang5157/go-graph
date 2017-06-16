@@ -82,5 +82,10 @@ func Test_Bfs(t *testing.T) {
 	// print graph
 	fmt.Println(g)
 
-	// todo
+	err = Bfs(g, "A", func(nd graph.Node) {
+		fmt.Println(nd.String())
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
 }
