@@ -1,4 +1,4 @@
-package dfs
+package traversal
 
 import (
 	"encoding/json"
@@ -14,7 +14,7 @@ import (
 var js map[string]map[string]map[string]interface{}
 
 func setup() error {
-	file, err := os.Open("../../../testdata/graph.json")
+	file, err := os.Open("../../testdata/graph.json")
 	if err != nil {
 		return err
 	}
@@ -57,13 +57,13 @@ func loadGraph(id string) (graph.Graph, error) {
 	for id, neighbour := range jsGraph {
 		nd, err := g.GetNode(graph.Id(id))
 		if err != nil {
-			nd = graph.NewNode(id)
+			nd = NewNode(id, "AnyTypeOfData")
 			g.AddNode(nd)
 		}
 		for id2, weight := range neighbour {
 			nd2, err := g.GetNode(graph.Id(id2))
 			if err != nil {
-				nd2 = graph.NewNode(id2)
+				nd2 = NewNode(id2, "AnyTypeOfData")
 				g.AddNode(nd2)
 			}
 			edge := graph.NewEdge(weight.(float64))
@@ -73,14 +73,34 @@ func loadGraph(id string) (graph.Graph, error) {
 	return g, nil
 }
 
-func Test_Dfs(t *testing.T) {
+func Test_Traversal(t *testing.T) {
 	g, err := loadGraph("graph_13")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	// print graph
 	fmt.Println(g)
+	nodes := g.Nodes()
 
-	// todo
+	// BFS
+	visited, err := Bfs(g, "A", func(nd Node) bool {
+		fmt.Printf("BFS visite %v %v\n", nd.String(), nd.(Node).Data())
+		return false
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Printf("\nGraph has %v nodes in total.\n", len(nodes))
+	fmt.Printf("BFS visited %v nodes in total.\n\n", len(visited))
+
+	// DFS
+	visited, err = Dfs(g, "A", func(nd Node) bool {
+		fmt.Printf("DFS visite %v %v\n", nd.String(), nd.(Node).Data())
+		return false
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Printf("\nGraph has %v nodes in total.\n", len(nodes))
+	fmt.Printf("DFS visited %v nodes in total.\n\n", len(visited))
 }
