@@ -119,6 +119,7 @@ func Dfs(g graph.Graph, id graph.Id, f func(Node) bool) (map[graph.Id]Node, erro
 	if err != nil {
 		return visited, graph.ErrNodeNotFound
 	}
+
 	tmpStack := stack.NewStack()
 	tmpStack.Push(id)
 	dfs(g, visited, tmpStack, f)
