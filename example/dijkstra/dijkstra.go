@@ -30,7 +30,6 @@ func Dijkstra(g graph.Graph, id graph.Id) (map[graph.Id]float64, error) {
 	targets := g.Targets()
 	var tmpId graph.Id
 	for {
-
 		// result completed
 		if len(dists) == 0 {
 			break
