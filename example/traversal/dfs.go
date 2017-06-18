@@ -5,14 +5,14 @@ import (
 	"github.com/jiangyang5157/golang-start/data/stack"
 )
 
-func dfs(g graph.Graph, visited map[graph.Id]Node, tmpStack *stack.Stack, f func(Node) bool) {
+func dfs(g graph.Graph, tmpStack *stack.Stack, f func(Node) bool, visited map[graph.Id]bool) {
 	if tmpStack.IsEmpty() {
 		return
 	}
 
 	tmpId := tmpStack.Peek().(graph.Id)
 	tmpNode, _ := g.GetNode(tmpId)
-	visited[tmpId] = tmpNode.(Node)
+	visited[tmpId] = true
 	if f(tmpNode.(Node)) {
 		tmpStack.Pop()
 		return
@@ -29,22 +29,20 @@ func dfs(g graph.Graph, visited map[graph.Id]Node, tmpStack *stack.Stack, f func
 			continue
 		}
 		tmpStack.Push(id)
-		dfs(g, visited, tmpStack, f)
+		dfs(g, tmpStack, f, visited)
 	}
 	tmpStack.Pop()
 	return
 }
 
-func Dfs(g graph.Graph, id graph.Id, f func(Node) bool) (map[graph.Id]Node, error) {
-	// visited holds a map of visited node
-	visited := make(map[graph.Id]Node)
+func Dfs(g graph.Graph, id graph.Id, f func(Node) bool) error {
 	_, err := g.GetNode(id)
 	if err != nil {
-		return visited, graph.ErrNodeNotFound
+		return graph.ErrNodeNotFound
 	}
 
 	tmpStack := stack.NewStack()
 	tmpStack.Push(id)
-	dfs(g, visited, tmpStack, f)
-	return visited, nil
+	dfs(g, tmpStack, f, make(map[graph.Id]bool))
+	return nil
 }

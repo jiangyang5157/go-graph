@@ -5,23 +5,23 @@ import (
 	"github.com/jiangyang5157/golang-start/data/queue"
 )
 
-func Bfs(g graph.Graph, id graph.Id, f func(Node) bool) (map[graph.Id]Node, error) {
-	// visited holds a map of visited node
-	visited := make(map[graph.Id]Node)
+func Bfs(g graph.Graph, id graph.Id, f func(Node) bool) error {
 	nd, err := g.GetNode(id)
 	if err != nil {
-		return visited, graph.ErrNodeNotFound
+		return graph.ErrNodeNotFound
 	}
 
+	// visited holds a map of visited node Id
+	visited := make(map[graph.Id]bool)
+
 	// Visite the begin node
-	visited[id] = nd.(Node)
+	visited[id] = true
 	if f(nd.(Node)) {
-		return visited, nil
+		return nil
 	}
 
 	targets := g.Targets()
 	tmpId := id
-	tmpNode := nd
 	tmpQueue := queue.NewQueue()
 	for {
 		if _, ok := targets[tmpId]; ok {
@@ -30,10 +30,10 @@ func Bfs(g graph.Graph, id graph.Id, f func(Node) bool) (map[graph.Id]Node, erro
 					continue
 				}
 				tmpId = id
-				tmpNode, _ = g.GetNode(tmpId)
-				visited[tmpId] = tmpNode.(Node)
+				tmpNode, _ := g.GetNode(tmpId)
+				visited[tmpId] = true
 				if f(tmpNode.(Node)) {
-					return visited, nil
+					return nil
 				}
 				tmpQueue.Push(tmpId)
 			}
@@ -46,5 +46,5 @@ func Bfs(g graph.Graph, id graph.Id, f func(Node) bool) (map[graph.Id]Node, erro
 		}
 	}
 
-	return visited, nil
+	return nil
 }

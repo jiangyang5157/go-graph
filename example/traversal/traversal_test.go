@@ -83,24 +83,28 @@ func Test_Traversal(t *testing.T) {
 	nodes := g.Nodes()
 
 	// BFS
-	visited, err := Bfs(g, "A", func(nd Node) bool {
+	visited := 0
+	err = Bfs(g, "A", func(nd Node) bool {
 		fmt.Printf("BFS visite %v %v\n", nd.String(), nd.(Node).Data())
+		visited++
 		return false
 	})
 	if err != nil {
 		t.Fatal(err)
 	}
 	fmt.Printf("\nGraph has %v nodes in total.\n", len(nodes))
-	fmt.Printf("BFS visited %v nodes in total.\n\n", len(visited))
+	fmt.Printf("BFS visited %v nodes in total.\n\n", visited)
 
 	// DFS
-	visited, err = Dfs(g, "A", func(nd Node) bool {
+	visited = 0
+	err = Dfs(g, "A", func(nd Node) bool {
 		fmt.Printf("DFS visite %v %v\n", nd.String(), nd.(Node).Data())
+		visited++
 		return false
 	})
 	if err != nil {
 		t.Fatal(err)
 	}
 	fmt.Printf("\nGraph has %v nodes in total.\n", len(nodes))
-	fmt.Printf("DFS visited %v nodes in total.\n\n", len(visited))
+	fmt.Printf("DFS visited %v nodes in total.\n\n", visited)
 }
