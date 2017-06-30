@@ -27,7 +27,7 @@ func Dijkstra(g graph.Graph, id graph.Id) (map[graph.Id]float64, error) {
 	// distance from source to source is zero
 	dists[id] = 0
 
-	targets := g.Targets()
+	targets := g.TargetsMap()
 	var tmpId graph.Id
 	for {
 		// result completed

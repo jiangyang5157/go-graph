@@ -18,7 +18,7 @@ func dfs(g graph.Graph, tmpStack *stack.Stack, f func(Node) bool, visited map[gr
 		return
 	}
 
-	targets := g.Targets()
+	targets := g.TargetsMap()
 	if _, ok := targets[tmpId]; !ok {
 		tmpStack.Pop()
 		return

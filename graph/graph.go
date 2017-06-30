@@ -82,10 +82,10 @@ type Graph interface {
 	Nodes() map[Id]Node
 
 	// Sources returns a map of sources.
-	Sources() map[Id]map[Id]Edge
+	SourcesMap() map[Id]map[Id]Edge
 
 	// Targets returns a map of targets.
-	Targets() map[Id]map[Id]Edge
+	TargetsMap() map[Id]map[Id]Edge
 
 	// GetSources returns a map of parent nodes.
 	GetSources(id Id) (map[Id]Node, error)
@@ -125,19 +125,19 @@ type graph struct {
 	// nodes stores all nodes.
 	nodes map[Id]Node
 
-	// sources maps a node to parents with edge.
-	sources map[Id]map[Id]Edge
+	// sourcesMap maps a node to parents with edge.
+	sourcesMap map[Id]map[Id]Edge
 
-	// targets maps a node to children with edge.
-	targets map[Id]map[Id]Edge
+	// targetsMap maps a node to children with edge.
+	targetsMap map[Id]map[Id]Edge
 }
 
 // newGraph returns a new graph.
 func newGraph() *graph {
 	return &graph{
-		nodes:   make(map[Id]Node),
-		sources: make(map[Id]map[Id]Edge),
-		targets: make(map[Id]map[Id]Edge),
+		nodes:      make(map[Id]Node),
+		sourcesMap: make(map[Id]map[Id]Edge),
+		targetsMap: make(map[Id]map[Id]Edge),
 	}
 }
 
@@ -168,18 +168,18 @@ func (g *graph) Nodes() map[Id]Node {
 	return g.nodes
 }
 
-func (g *graph) Sources() map[Id]map[Id]Edge {
+func (g *graph) SourcesMap() map[Id]map[Id]Edge {
 	g.RWMutex.RLock()
 	defer g.RWMutex.RUnlock()
 
-	return g.sources
+	return g.sourcesMap
 }
 
-func (g *graph) Targets() map[Id]map[Id]Edge {
+func (g *graph) TargetsMap() map[Id]map[Id]Edge {
 	g.RWMutex.RLock()
 	defer g.RWMutex.RUnlock()
 
-	return g.targets
+	return g.targetsMap
 }
 
 func (g *graph) GetSources(id Id) (map[Id]Node, error) {
@@ -191,8 +191,8 @@ func (g *graph) GetSources(id Id) (map[Id]Node, error) {
 	}
 
 	srcs := make(map[Id]Node)
-	if _, ok := g.sources[id]; ok {
-		for id2, _ := range g.sources[id] {
+	if _, ok := g.sourcesMap[id]; ok {
+		for id2, _ := range g.sourcesMap[id] {
 			srcs[id2] = g.nodes[id2]
 		}
 	}
@@ -208,8 +208,8 @@ func (g *graph) GetTargets(id Id) (map[Id]Node, error) {
 	}
 
 	tgts := make(map[Id]Node)
-	if _, ok := g.targets[id]; ok {
-		for id2 := range g.targets[id] {
+	if _, ok := g.targetsMap[id]; ok {
+		for id2 := range g.targetsMap[id] {
 			tgts[id2] = g.nodes[id2]
 		}
 	}
@@ -249,15 +249,15 @@ func (g *graph) DeleteNode(id Id) error {
 	}
 
 	delete(g.nodes, id)
-	delete(g.sources, id)
-	delete(g.targets, id)
+	delete(g.sourcesMap, id)
+	delete(g.targetsMap, id)
 
 	// remove edges which source is the node
-	for _, srcs := range g.sources {
+	for _, srcs := range g.sourcesMap {
 		delete(srcs, id)
 	}
 	// remove edges which target is the node
-	for _, tgts := range g.targets {
+	for _, tgts := range g.targetsMap {
 		delete(tgts, id)
 	}
 
@@ -275,9 +275,9 @@ func (g *graph) GetEdge(src, tgt Id) (Edge, error) {
 		return nil, ErrNodeNotFound
 	}
 
-	if _, ok := g.targets[src]; ok {
+	if _, ok := g.targetsMap[src]; ok {
 		// find the edge from src to tgt
-		if edge, ok2 := g.targets[src][tgt]; ok2 {
+		if edge, ok2 := g.targetsMap[src][tgt]; ok2 {
 			return edge, nil
 		}
 	}
@@ -296,22 +296,22 @@ func (g *graph) AddEdge(src, tgt Id, eg Edge) error {
 		return ErrNodeNotFound
 	}
 
-	if _, ok := g.sources[tgt]; !ok {
-		g.sources[tgt] = make(map[Id]Edge)
+	if _, ok := g.sourcesMap[tgt]; !ok {
+		g.sourcesMap[tgt] = make(map[Id]Edge)
 	}
-	if _, ok := g.targets[src]; !ok {
-		g.targets[src] = make(map[Id]Edge)
-	}
-
-	if _, ok := g.sources[tgt][src]; ok {
-		return ErrEdgeExisted
-	}
-	if _, ok := g.targets[src][tgt]; ok {
-		return ErrEdgeExisted
+	if _, ok := g.targetsMap[src]; !ok {
+		g.targetsMap[src] = make(map[Id]Edge)
 	}
 
-	g.sources[tgt][src] = eg
-	g.targets[src][tgt] = eg
+	if _, ok := g.sourcesMap[tgt][src]; ok {
+		return ErrEdgeExisted
+	}
+	if _, ok := g.targetsMap[src][tgt]; ok {
+		return ErrEdgeExisted
+	}
+
+	g.sourcesMap[tgt][src] = eg
+	g.targetsMap[src][tgt] = eg
 
 	return nil
 }
@@ -327,15 +327,15 @@ func (g *graph) DeleteEdge(src, tgt Id) error {
 		return ErrNodeNotFound
 	}
 
-	if _, ok := g.sources[tgt]; ok {
-		if _, ok2 := g.sources[tgt][src]; ok2 {
-			delete(g.sources[tgt], src)
+	if _, ok := g.sourcesMap[tgt]; ok {
+		if _, ok2 := g.sourcesMap[tgt][src]; ok2 {
+			delete(g.sourcesMap[tgt], src)
 		}
 	}
 
-	if _, ok := g.targets[src]; ok {
-		if _, ok2 := g.targets[src][tgt]; ok2 {
-			delete(g.targets[src], tgt)
+	if _, ok := g.targetsMap[src]; ok {
+		if _, ok2 := g.targetsMap[src][tgt]; ok2 {
+			delete(g.targetsMap[src], tgt)
 		}
 	}
 

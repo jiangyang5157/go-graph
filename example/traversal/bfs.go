@@ -20,7 +20,7 @@ func Bfs(g graph.Graph, id graph.Id, f func(Node) bool) error {
 		return nil
 	}
 
-	targets := g.Targets()
+	targets := g.TargetsMap()
 	tmpId := id
 	tmpQueue := queue.NewQueue()
 	for {
