@@ -252,11 +252,11 @@ func (g *graph) DeleteNode(id Id) error {
 	delete(g.sources, id)
 	delete(g.targets, id)
 
-	// remove edges where source is the node
+	// remove edges which source is the node
 	for _, srcs := range g.sources {
 		delete(srcs, id)
 	}
-	// remove edges where target is the node
+	// remove edges which target is the node
 	for _, tgts := range g.targets {
 		delete(tgts, id)
 	}
