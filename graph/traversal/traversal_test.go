@@ -57,13 +57,13 @@ func loadGraph(id string) (graph.Graph, error) {
 	for id, neighbour := range jsGraph {
 		nd, err := g.GetNode(graph.Id(id))
 		if err != nil {
-			nd = NewNode(id, "AnyTypeOfData")
+			nd = graph.NewNode(id)
 			g.AddNode(nd)
 		}
 		for id2, weight := range neighbour {
 			nd2, err := g.GetNode(graph.Id(id2))
 			if err != nil {
-				nd2 = NewNode(id2, "AnyTypeOfData")
+				nd2 = graph.NewNode(id2)
 				g.AddNode(nd2)
 			}
 			edge := graph.NewEdge(weight.(float64))
@@ -84,8 +84,8 @@ func Test_Traversal(t *testing.T) {
 
 	// BFS
 	visited := 0
-	err = Bfs(g, "A", func(nd Node) bool {
-		fmt.Printf("BFS visite %v %v\n", nd.String(), nd.(Node).Data())
+	err = Bfs(g, "A", func(nd graph.Node) bool {
+		fmt.Printf("BFS visite %v\n", nd.String())
 		visited++
 		return false
 	})
@@ -97,8 +97,8 @@ func Test_Traversal(t *testing.T) {
 
 	// DFS
 	visited = 0
-	err = Dfs(g, "A", func(nd Node) bool {
-		fmt.Printf("DFS visite %v %v\n", nd.String(), nd.(Node).Data())
+	err = Dfs(g, "A", func(nd graph.Node) bool {
+		fmt.Printf("DFS visite %v\n", nd.String())
 		visited++
 		return false
 	})

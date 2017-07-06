@@ -5,7 +5,7 @@ import (
 	"github.com/jiangyang5157/golang-start/data/queue"
 )
 
-func Bfs(g graph.Graph, id graph.Id, f func(Node) bool) error {
+func Bfs(g graph.Graph, id graph.Id, f func(graph.Node) bool) error {
 	nd, err := g.GetNode(id)
 	if err != nil {
 		return graph.ErrNodeNotFound
@@ -16,7 +16,7 @@ func Bfs(g graph.Graph, id graph.Id, f func(Node) bool) error {
 
 	// Visite the begin node
 	visited[id] = true
-	if f(nd.(Node)) {
+	if f(nd) {
 		return nil
 	}
 
@@ -32,7 +32,7 @@ func Bfs(g graph.Graph, id graph.Id, f func(Node) bool) error {
 				tmpId = id
 				tmpNode, _ := g.GetNode(tmpId)
 				visited[tmpId] = true
-				if f(tmpNode.(Node)) {
+				if f(tmpNode) {
 					return nil
 				}
 				tmpQueue.Push(tmpId)

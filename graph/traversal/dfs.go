@@ -5,7 +5,7 @@ import (
 	"github.com/jiangyang5157/golang-start/data/stack"
 )
 
-func dfs(g graph.Graph, tmpStack *stack.Stack, f func(Node) bool, visited map[graph.Id]bool) {
+func dfs(g graph.Graph, tmpStack *stack.Stack, f func(graph.Node) bool, visited map[graph.Id]bool) {
 	if tmpStack.IsEmpty() {
 		return
 	}
@@ -13,7 +13,7 @@ func dfs(g graph.Graph, tmpStack *stack.Stack, f func(Node) bool, visited map[gr
 	tmpId := tmpStack.Peek().(graph.Id)
 	tmpNode, _ := g.GetNode(tmpId)
 	visited[tmpId] = true
-	if f(tmpNode.(Node)) {
+	if f(tmpNode) {
 		tmpStack.Pop()
 		return
 	}
@@ -35,7 +35,7 @@ func dfs(g graph.Graph, tmpStack *stack.Stack, f func(Node) bool, visited map[gr
 	return
 }
 
-func Dfs(g graph.Graph, id graph.Id, f func(Node) bool) error {
+func Dfs(g graph.Graph, id graph.Id, f func(graph.Node) bool) error {
 	_, err := g.GetNode(id)
 	if err != nil {
 		return graph.ErrNodeNotFound
