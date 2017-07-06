@@ -12,9 +12,7 @@ type Id string
 
 // Node describes the methods of node operations.
 type Node interface {
-
-	// String describes the Graph.
-	String() string
+	fmt.Stringer
 
 	// Id returns the node identifier.
 	Id() Id
@@ -40,9 +38,7 @@ func (nd *node) Id() Id {
 
 // Edge describes the methods of edge operations.
 type Edge interface {
-
-	// String describes the Graph.
-	String() string
+	fmt.Stringer
 
 	// GetWeight returns the weight of the edge.
 	GetWeight() interface{}
@@ -74,9 +70,7 @@ func (eg *edge) SetWeight(wgt interface{}) {
 
 // Graph describes the methods of graph operations.
 type Graph interface {
-
-	// String describes the Graph.
-	String() string
+	fmt.Stringer
 
 	// Nodes returns a map of nodes.
 	Nodes() map[Id]Node
